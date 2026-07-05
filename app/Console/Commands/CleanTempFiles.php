@@ -30,7 +30,7 @@ class CleanTempFiles extends Command
 
             // Untuk pengujian diset 10 detik. Jika production, ganti menjadi > 1440 (24 jam)
             // if ($lastModified->copy()->addMinutes(1440)->isPast()) { // 24 hours
-            if ($lastModified->copy()->addSeconds(10)->isPast()) {
+            if ($lastModified->copy()->addSeconds(1440)->isPast()) {
                 $filename = basename($file);
 
                 UploadFile::where('name', $filename)->delete();

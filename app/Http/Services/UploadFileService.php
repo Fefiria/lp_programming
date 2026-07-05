@@ -72,19 +72,23 @@ class UploadFileService
     }
 
 
-    public function moveFileToPrimary(string $tempFilename, string $primaryDirectory)
+    public function moveFileToPrimary(string $idFile, string $primaryDirectory)
     {
+        $uploadFile = UploadFile::where('id_file', $idFile)->first();
+        
+        if (!$uploadFile) {
+            return false;
+        }
+
+        $tempFilename = $uploadFile->name;
         $tempPath = 'temp/' . $tempFilename;
         $primaryPath = $primaryDirectory . '/' . $tempFilename;
 
         if (Storage::disk('public')->exists($tempPath)) {
             Storage::disk('public')->move($tempPath, $primaryPath);
 
-            $uploadFile = UploadFile::where('name', $tempFilename)->first();
-            if ($uploadFile) {
-                $uploadFile->path = asset('storage/' . $primaryPath);
-                $uploadFile->save();
-            }
+            $uploadFile->path = asset('storage/' . $primaryPath);
+            $uploadFile->save();
 
             return $primaryPath;
         }

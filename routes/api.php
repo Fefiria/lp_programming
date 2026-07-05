@@ -9,3 +9,4 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::apiResource('upload-files', UploadFileController::class);
+Route::post('/upload-files/publish-to-user-storage', [UploadFileController::class, 'publishToUserStorageExample']);

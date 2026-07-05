@@ -83,4 +83,44 @@ class UploadFileController extends Controller
         }
     }
 
+    public function publishToUserStorageExample(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_file' => 'required|exists:upload_files,id_file',
+            ]);
+
+            $idFile = $request->input('id_file');
+            $primaryDirectory = 'users';
+
+            $fileService = new UploadFileService();
+            $newPath = $fileService->moveFileToPrimary($idFile, $primaryDirectory);
+
+            if ($newPath) {
+                return response()->json([
+                    'status' => 'success',
+                    'status_code' => 200,
+                    'message' => 'File berhasil dipindahkan ke primary folder',
+                    'data' => [
+                        'new_path' => $newPath,
+                        'full_url' => asset('storage/' . $newPath)
+                    ]
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 404,
+                'message' => 'File temp tidak ditemukan atau sudah kadaluarsa/terhapus',
+            ], 404);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => 'Gagal memindahkan file',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
