@@ -17,8 +17,9 @@ class UploadFileController extends Controller
             $page = $request->query('page', 1);
             $sort = $request->query('sort', 'created_at');
             $order = $request->query('order', 'desc');
+            $search = $request->query('search', '');
 
-            $results = UploadFile::orderBy($sort, $order)->paginate($limit, ['*'], 'page', $page);
+            $results = UploadFile::where('name', 'like', "%{$search}%")->orderBy($sort, $order)->paginate($limit, ['*'], 'page', $page);
 
             return UploadFileResource::collection($results)
                 ->additional([
