@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use Illuminate\Http\UploadedFile;
 use App\Models\UploadFile;
+use Illuminate\Support\Facades\Storage;
 
 class UploadFileService
 {
@@ -70,23 +71,15 @@ class UploadFileService
         return $uploadFile;
     }
 
-    /**
-     * Memindahkan file dari folder temp ke lokasi utama (primary).
-     *
-     * @param string $tempFilename Nama file di dalam folder temp (misal: "saidjaidsa.jpg")
-     * @param string $primaryDirectory Direktori tujuan (misal: "users/divisi")
-     * @return string|false Path file yang baru jika sukses, false jika gagal
-     */
+
     public function moveFileToPrimary(string $tempFilename, string $primaryDirectory)
     {
         $tempPath = 'temp/' . $tempFilename;
         $primaryPath = $primaryDirectory . '/' . $tempFilename;
 
-        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($tempPath)) {
-            // Memindahkan file dari temp ke folder primary
-            \Illuminate\Support\Facades\Storage::disk('public')->move($tempPath, $primaryPath);
-            
-            // Perbarui record di database jika ada
+        if (Storage::disk('public')->exists($tempPath)) {
+            Storage::disk('public')->move($tempPath, $primaryPath);
+
             $uploadFile = UploadFile::where('name', $tempFilename)->first();
             if ($uploadFile) {
                 $uploadFile->path = asset('storage/' . $primaryPath);

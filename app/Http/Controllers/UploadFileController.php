@@ -8,8 +8,6 @@ use App\Models\UploadFile;
 use App\Http\Services\UploadFileService;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 
 class UploadFileController extends Controller
 {
