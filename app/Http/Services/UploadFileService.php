@@ -23,7 +23,7 @@ class UploadFileService
     public function uploadFile(UploadFileRequest $file): UploadFile
     {
         $filename = time() . '_' . $file->getClientOriginalName();
-        $path = $file->storeAs('uploads', $filename, 'public');
+        $path = $file->storeAs('temp', $filename, 'public');
         $rawSize = $file->getSize();
         $formattedSize = $this->formatSize($rawSize);
 

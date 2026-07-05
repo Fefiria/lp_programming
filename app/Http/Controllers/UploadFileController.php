@@ -23,11 +23,13 @@ class UploadFileController extends Controller
             return UploadFileResource::collection($results)
                 ->additional([
                     'status' => 'success',
+                    'status_code' => 200,
                     'message' => 'Upload files retrieved successfully',
                 ]);
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
+                'status_code' => $e->getCode() ?: 500,
                 'message' => 'Failed to retrieve upload files',
                 'error' => $e->getMessage()
             ], 500);
@@ -42,32 +44,38 @@ class UploadFileController extends Controller
             }
 
             $uploadFile = $fileService->uploadFile($request->file('file'));
-
-            return response()->json([
-                'message' => 'Upload file created successfully',
-                'data' => new UploadFileResource($uploadFile)
-            ], 201);
+            return UploadFileResource::make($uploadFile)
+                ->additional([
+                    'status' => 'success',
+                    'status_code' => 201,
+                    'message' => 'Upload file created successfully',
+                ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'status_code' => $e->getCode() ?: 500,
+                'message' => 'Failed to create upload file',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
     public function show(UploadFile $uploadFile)
     {
         try {
-            return response()->json(['message' => 'Upload file retrieved successfully', 'data' => new UploadFileResource($uploadFile)], 200);
+            return UploadFileResource::make($uploadFile)
+                ->additional([
+                    'status' => 'success',
+                    'status_code' => 200,
+                    'message' => 'Upload file retrieved successfully',
+                ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'status_code' => $e->getCode() ?: 500,
+                'message' => 'Failed to retrieve upload file',
+                'error' => $e->getMessage()
+            ], 500);
         }
-    }
-
-    public function update(Request $request, UploadFile $uploadFile)
-    {
-        //
-    }
-
-    public function destroy(UploadFile $uploadFile)
-    {
-        //
     }
 }
