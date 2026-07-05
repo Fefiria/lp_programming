@@ -2,7 +2,7 @@
 
 namespace App\Http\Services;
 
-use App\Http\Requests\UploadFileRequest;
+use Illuminate\Http\UploadedFile;
 use App\Models\UploadFile;
 
 class UploadFileService
@@ -20,23 +20,82 @@ class UploadFileService
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
 
-    public function uploadFile(UploadFileRequest $file): UploadFile
+    public function uploadFile(UploadedFile $file): UploadFile
     {
         $filename = time() . '_' . $file->getClientOriginalName();
-        $path = $file->storeAs('temp', $filename, 'public');
-        $rawSize = $file->getSize();
-        $formattedSize = $this->formatSize($rawSize);
+        $mimeType = $file->getClientMimeType();
+        $destinationPath = storage_path('app/public/temp/');
+
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+
+        $targetFile = $destinationPath . $filename;
+
+        if (str_contains($mimeType, 'image')) {
+            $sourcePath = $file->getRealPath();
+            $image = @imagecreatefromstring(file_get_contents($sourcePath));
+            if ($image) {
+                imagejpeg($image, $targetFile, 50);
+                imagedestroy($image);
+                $rawSize = filesize($targetFile);
+            } else {
+                $file->storeAs('temp', $filename, 'public');
+                $rawSize = $file->getSize();
+            }
+        } elseif ($mimeType === 'application/pdf') {
+            $sourcePath = $file->getRealPath();
+            $command = "gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile=" . escapeshellarg($targetFile) . " " . escapeshellarg($sourcePath);
+
+            shell_exec($command);
+
+            if (file_exists($targetFile)) {
+                $rawSize = filesize($targetFile);
+            } else {
+                $file->storeAs('temp', $filename, 'public');
+                $rawSize = $file->getSize();
+            }
+        } else {
+            $file->storeAs('temp', $filename, 'public');
+            $rawSize = $file->getSize();
+        }
 
         $uploadFile = new UploadFile();
         $uploadFile->name = $filename;
-
-        $uploadFile->path = asset('storage/' . $path);
-        $uploadFile->type = $file->getClientMimeType();
-
-        $uploadFile->size = $formattedSize;
-
+        $uploadFile->path = asset('storage/temp/' . $filename);
+        $uploadFile->type = $mimeType;
+        $uploadFile->size = $rawSize;
         $uploadFile->save();
 
         return $uploadFile;
+    }
+
+    /**
+     * Memindahkan file dari folder temp ke lokasi utama (primary).
+     *
+     * @param string $tempFilename Nama file di dalam folder temp (misal: "saidjaidsa.jpg")
+     * @param string $primaryDirectory Direktori tujuan (misal: "users/divisi")
+     * @return string|false Path file yang baru jika sukses, false jika gagal
+     */
+    public function moveFileToPrimary(string $tempFilename, string $primaryDirectory)
+    {
+        $tempPath = 'temp/' . $tempFilename;
+        $primaryPath = $primaryDirectory . '/' . $tempFilename;
+
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($tempPath)) {
+            // Memindahkan file dari temp ke folder primary
+            \Illuminate\Support\Facades\Storage::disk('public')->move($tempPath, $primaryPath);
+            
+            // Perbarui record di database jika ada
+            $uploadFile = UploadFile::where('name', $tempFilename)->first();
+            if ($uploadFile) {
+                $uploadFile->path = asset('storage/' . $primaryPath);
+                $uploadFile->save();
+            }
+
+            return $primaryPath;
+        }
+
+        return false;
     }
 }

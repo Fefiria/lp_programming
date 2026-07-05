@@ -22,4 +22,14 @@ class UploadFileRequest extends FormRequest
             ],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'file.required' => 'File wajib diunggah.',
+            'file.file'     => 'Format yang diunggah harus berupa file.',
+            'file.mimes'    => 'Format file harus berupa: jpg, jpeg, png, pdf, doc, docx, xls, atau xlsx.',
+            'file.max'      => 'Ukuran file tidak boleh lebih dari 2 MB.',
+        ];
+    }
 }

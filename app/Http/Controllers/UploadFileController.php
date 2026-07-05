@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UploadFileRequest;
 use App\Http\Resources\UploadFileResource;
 use App\Models\UploadFile;
+use App\Http\Services\UploadFileService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class UploadFileController extends Controller
 {
@@ -37,14 +40,16 @@ class UploadFileController extends Controller
         }
     }
 
-    public function store(UploadFileRequest $request, UploadFile $fileService)
+    public function store(UploadFileRequest $request)
     {
         try {
             if (!$request->hasFile('file')) {
                 return response()->json(['error' => 'No file uploaded'], 400);
             }
 
+            $fileService = new UploadFileService();
             $uploadFile = $fileService->uploadFile($request->file('file'));
+
             return UploadFileResource::make($uploadFile)
                 ->additional([
                     'status' => 'success',
@@ -79,4 +84,5 @@ class UploadFileController extends Controller
             ], 500);
         }
     }
+
 }
