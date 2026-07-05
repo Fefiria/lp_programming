@@ -38,6 +38,42 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "fetch",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "New Request",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_file\": \"019f32f1-c3bf-719c-b688-b23178523cef\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BasePath}}/api/upload-files/move-to-primary",
+              "host": [
+                "{{BasePath}}"
+              ],
+              "path": [
+                "api",
+                "upload-files",
+                "move-to-primary"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     }
