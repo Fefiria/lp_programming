@@ -1,0 +1,81 @@
+{
+  "info": {
+    "_postman_id": "690a8d96-9178-4298-9cbe-1bf948b4c876",
+    "name": "landing_page",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "56394687",
+    "_collection_link": "https://go.postman.co/collection/56394687-690a8d96-9178-4298-9cbe-1bf948b4c876?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "upload_file",
+      "item": [
+        {
+          "name": "uploadFile",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "5f01a427-56ac-43d5-97aa-6f1032845b70",
+                  "src": "postman-cloud:///1f17855a-7bde-47b0-812f-6f7d67a2fd07"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BasePath}}/api/upload-files",
+              "host": [
+                "{{BasePath}}"
+              ],
+              "path": [
+                "api",
+                "upload-files"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "fetch",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "New Request",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_file\": \"019f32f1-c3bf-719c-b688-b23178523cef\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BasePath}}/api/upload-files/move-to-primary",
+              "host": [
+                "{{BasePath}}"
+              ],
+              "path": [
+                "api",
+                "upload-files",
+                "move-to-primary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
